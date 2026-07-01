@@ -27,19 +27,21 @@ for city in cities:
     if response.status_code == 200:
         data = response.json()
         
-        # FIX 1: This block must be inside the IF statement
         city_df = pd.DataFrame(data['daily'])
         city_df['city_name'] = city['name']
         city_dfs.append(city_df)
         print(f"Successfully retrieved data for {city['name']}")
     else:
-        # This only runs if the API fails
         print(f"Failure to retrieve data for {city['name']}. The status code is: {response.status_code}")
 
-# FIX 2: This is completely outside the loop (no indentation)
-# It takes the list of ALL accumulated city dataframes and merges them into one master dataframe.
 df_master = pd.concat(city_dfs, ignore_index=True)
 
-# Test print to make sure it worked
-print("\nSuccess! Here is a preview of the combined data:")
-print(df_master.head())
+
+# data cleaning 
+
+df_master.dropna(inplace=True)
+
+df_master['date'] = pd.to_datetime(df_master['time'])
+df_master.drop(columns=['time'], inplace=True)
+
+df_master.drop_duplicates(inplace=True)
