@@ -2,23 +2,19 @@ import streamlit as st
 import pandas as pd
 import sqlite3
 
-# Set page configuration using compliant wide layout
 st.set_page_config(page_title="Weather Analytics Dashboard", layout="wide")
 
 st.title("Weather Analytics Platform")
 st.markdown("---")
 
-# Database Connection Helper
 def run_query(query):
     with sqlite3.connect("weather_db.db") as conn:
         return pd.read_sql_query(query, conn)
 
-# Sidebar Filter
 st.sidebar.header("Dashboard Controls")
 db_view = st.sidebar.selectbox("Choose View", ["Overview & Analytics", "Raw Relational Tables"])
 
 if db_view == "Overview & Analytics":
-    # Bento-style Layout Row 1: Temperature Extremes
     col_heat, col_cold = st.columns(2)
     
     with col_heat:
@@ -49,7 +45,6 @@ if db_view == "Overview & Analytics":
 
     st.markdown("---")
     
-    # Bento-style Layout Row 2: Precipitation Trend Matrix
     with st.container(border=True):
         st.subheader("Precipitation Matrix")
         q2 = """
@@ -61,7 +56,6 @@ if db_view == "Overview & Analytics":
         precip_data = run_query(q2)
         pivot_df = precip_data.pivot(index='month', columns='city_name', values='total_precipitation').fillna(0)
     
-    # Explicitly mapping axis descriptors
         st.line_chart(
             pivot_df, 
             height=250,
@@ -69,7 +63,6 @@ if db_view == "Overview & Analytics":
             y_label="mm of Precipitation",
         )
 
-    # Bento-style Layout Row 3: Wind Activity (Fixed Column Error)
     with st.container(border=True):
         st.subheader("Peak Wind Velocity Records")
         st.caption("Top 10 historical cites and their weeks demonstrating intense air velocity patterns")
